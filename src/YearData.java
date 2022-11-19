@@ -1,9 +1,9 @@
 public class YearData {
-    Integer month;
+    int month;
     double expenses;
     double income;
 
-    public YearData(Integer month){
+    public YearData(int month){
         this.month = month;
     }
 

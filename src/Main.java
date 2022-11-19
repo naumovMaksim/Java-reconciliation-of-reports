@@ -3,27 +3,25 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
-        MonthlyReport monthlyReport = new MonthlyReport();
-        YearlyReport yearlyReport = new YearlyReport();
-        DataReconciliation dataReconciliation = new DataReconciliation();
+        ReportEngine reportEngine = new ReportEngine();
 
 
         while (true){
             printMenu();
             int userInput = scanner.nextInt();
-            String pathYear = "2021";
-            String pathMonth = "3";
+            String pathY = "2021"; // рассматриваемый год
+            String pathM = "3"; // колличество загруженных месяцев
 
             if (userInput == 1){
-                monthlyReport.getExpensesAndIncome(pathYear, pathMonth);
+                reportEngine.getMonthExpensesAndIncome(pathY, pathM);
             } else if (userInput == 2) {
-                yearlyReport.getExpensesAndIncome(pathYear);
+                reportEngine.getYearExpensesAndIncome(pathY);
             } else if (userInput == 3) {
-                dataReconciliation.reconciliation(monthlyReport.monthExpensesAndIncome, yearlyReport.yearExpensesAndIncome);
+                reportEngine.reconciliation();
             } else if (userInput == 4) {
-                monthlyReport.printMonthReport();
+                reportEngine.printMonthReport();
             } else if (userInput == 5) {
-                yearlyReport.printYearInfo(pathYear);
+                reportEngine.printYearInfo(pathY);
             } else if (userInput == 0) {
                 System.out.println("Программа завершена");
                 break;
