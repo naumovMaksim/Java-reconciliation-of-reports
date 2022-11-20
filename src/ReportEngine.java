@@ -4,12 +4,11 @@ import java.util.List;
 
 public class ReportEngine {
     Reader reader = new Reader();
+    HashMap<Integer, MonthlyReport> monthlyReports = new HashMap<>();
+    YearlyReport yearlyReport;
 
-    HashMap<Integer, HashMap<String, MonthData>> monthExpensesAndIncome;
-    HashMap<Integer, YearData> yearExpensesAndIncome;
-
-    public  void getYearExpensesAndIncome(String pathYear) {
-        yearExpensesAndIncome = new HashMap<>();
+    public void getYearExpensesAndIncome(String pathYear) {
+        HashMap<Integer, YearData> yearExpensesAndIncome = new HashMap<>();
         List<String> lines = reader.readFileContentsOrNull( "resources/y." + pathYear + ".csv");
         if (lines.size() != 0) {
             for (int i = 1; i < lines.size(); i++) {
@@ -29,13 +28,18 @@ public class ReportEngine {
                 } else {
                     yearData.income = amount;
                 }
+
             }
+            int y = Integer.parseInt(pathYear);
+            yearlyReport = new YearlyReport();
+            yearlyReport.year = y;
+            yearlyReport.yearExpensesAndIncome = yearExpensesAndIncome;
             System.out.println("Файл считан");
-        } else System.out.println("Невозможно прочитать файл с годовым отчётом. Возможно, файл не находится в нужной директории");
+        }
     }
 
     public void getMonthExpensesAndIncome(String pathY, String pathM) {
-        monthExpensesAndIncome = new HashMap<>();
+        HashMap<Integer, HashMap<String, MonthData>> monthExpensesAndIncome = new HashMap<>();
         int months = Integer.parseInt(pathM);
         for (int i = 1; i <= months; i++) {
             HashMap<String, MonthData> item = new HashMap<>();
@@ -57,16 +61,23 @@ public class ReportEngine {
 
                     item.put(itName, monthData);
 
-                } monthExpensesAndIncome.put(i, item);
-            }
+                }
+                monthExpensesAndIncome.put(i, item);
+                int y = Integer.parseInt(pathY);
+                MonthlyReport monthlyReport = new MonthlyReport();
+                monthlyReport.month = i;
+                monthlyReport.year = y;
+                monthlyReport.monthExpensesAndIncome = monthExpensesAndIncome;
+                monthlyReports.put(i, monthlyReport);
+            } else break;
         }
         if (!monthExpensesAndIncome.isEmpty()){
             System.out.println("Файл считан");
-        }else System.out.println("Невозможно прочитать файл с годовым отчётом. Возможно, файл не находится в нужной директории");
+        }
     }
 
     public void printYearInfo(String pathYear){
-        if (yearExpensesAndIncome != null) {
+        if (yearlyReport.yearExpensesAndIncome != null) {
             System.out.println(pathYear);
             profitPerMonth();
             midExpense();
@@ -75,78 +86,21 @@ public class ReportEngine {
     }
 
     public void printMonthReport(){
-        if (monthExpensesAndIncome == null) {
+        if (monthlyReports.isEmpty()) {
             System.out.println("Файлы месячеых отчётов не были считаны");
         } else {
-            for (int month: monthExpensesAndIncome.keySet()) {
-                if (month == 1) {
-                    System.out.println("Январь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 2) {
-                    System.out.println("Февраль");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 3) {
-                    System.out.println("Март");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 4) {
-                    System.out.println("Апрель");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 5) {
-                    System.out.println("Май");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 6) {
-                    System.out.println("Июнь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 7) {
-                    System.out.println("Июль");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 8) {
-                    System.out.println("Август");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 9) {
-                    System.out.println("Сентябрь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 10) {
-                    System.out.println("Октябрь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 11) {
-                    System.out.println("Ноябрь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
-                if (month == 12) {
-                    System.out.println("Декабрь");
-                    System.out.println("Самый прибыльный товар: " + bestItem(month));
-                    System.out.println("Самая большая трата составила: " + maxExpense(month));
-                }
+            for (int month: monthlyReports.keySet()) {
+                System.out.println(getMonthName(month - 1));
+                System.out.println("Самый прибыльный товар: " + bestItem(month));
+                System.out.println("Самая большая трата составила: " + maxExpense(month));// Посмотрел enum, показалось немного сложным пока что, решил оставвить так:)
             }
         }
     }
 
     public void profitPerMonth() {
         double profit = 0;
-        for (int months: yearExpensesAndIncome.keySet()) {
-            YearData yearData = yearExpensesAndIncome.get(months);
+        for (int months: yearlyReport.yearExpensesAndIncome.keySet()) {
+            YearData yearData = yearlyReport.yearExpensesAndIncome.get(months);
             double difference = yearData.income - yearData.expenses;
             profit += difference;
             System.out.println("Прибыль за " + months + " месяц: " + profit);
@@ -155,29 +109,30 @@ public class ReportEngine {
 
     public void midExpense(){
         double sum = 0;
-        for (int months: yearExpensesAndIncome.keySet()) {
-            YearData yearData = yearExpensesAndIncome.get(months);
+        for (int months: yearlyReport.yearExpensesAndIncome.keySet()) {
+            YearData yearData = yearlyReport.yearExpensesAndIncome.get(months);
             sum += yearData.expenses;
         }
-        double mid = sum / yearExpensesAndIncome.size();
+        double mid = sum / yearlyReport.yearExpensesAndIncome.size();
         System.out.println("Средний расход за все месяцы в году: " + mid);
     }
 
     public void midIncome(){
         double sum = 0;
-        for (int months: yearExpensesAndIncome.keySet()) {
-            YearData yearData = yearExpensesAndIncome.get(months);
+        for (int months: yearlyReport.yearExpensesAndIncome.keySet()) {
+            YearData yearData = yearlyReport.yearExpensesAndIncome.get(months);
             sum += yearData.income;
         }
-        double mid = sum / yearExpensesAndIncome.size();
+        double mid = sum / yearlyReport.yearExpensesAndIncome.size();
         System.out.println("Средний доход за все месяцы в году: " + mid);
     }
 
     public HashMap <String, Double> bestItem(int month){
         HashMap <String, Double> bestItem = new HashMap<>();
+
         String itName = "";
         double maxSum = 0;
-        HashMap <String, MonthData> item = monthExpensesAndIncome.get(month);
+        HashMap <String, MonthData> item = monthlyReports.get(month).monthExpensesAndIncome.get(month);
         for (MonthData one: item.values()) {
             if (!one.isExpense){
                 double sum = one.quantity * one.sumOfOne;
@@ -195,7 +150,7 @@ public class ReportEngine {
         HashMap <String, Double> maxExpense = new HashMap<>();
         double mExpense = 0;
         String itName = "";
-        HashMap <String, MonthData> item = monthExpensesAndIncome.get(month);
+        HashMap <String, MonthData> item = monthlyReports.get(month).monthExpensesAndIncome.get(month);
         for (MonthData one: item.values()) {
             if (one.isExpense){
                 double sum = one.quantity * one.sumOfOne;
@@ -211,46 +166,51 @@ public class ReportEngine {
 
     public HashMap<Integer, Double> allMonthExpenses(){
         HashMap <Integer, Double> allMonthExpenses = new HashMap<>();
-        for (int month: monthExpensesAndIncome.keySet()) {
-            HashMap<String, MonthData> item = monthExpensesAndIncome.get(month);
+        for (int months: monthlyReports.keySet()) {
+            HashMap<String, MonthData> item = monthlyReports.get(months).monthExpensesAndIncome.get(months);
             double allExpense = 0;
             for (MonthData one : item.values()) {
                 if (one.isExpense) {
                     allExpense += one.quantity * one.sumOfOne;
                 }
             }
-            allMonthExpenses.put(month, allExpense);
+            allMonthExpenses.put(months, allExpense);
         }
         return allMonthExpenses;
     }
 
     public HashMap<Integer, Double> allMonthIncome(){
         HashMap <Integer, Double> allMonthIncome = new HashMap<>();
-        for (int month: monthExpensesAndIncome.keySet()) {
-            HashMap<String, MonthData> item = monthExpensesAndIncome.get(month);
+        for (int months: monthlyReports.keySet()) {
+            HashMap<String, MonthData> item = monthlyReports.get(months).monthExpensesAndIncome.get(months);
             double allIncome = 0;
             for (MonthData one : item.values()) {
                 if (!one.isExpense) {
                     allIncome += one.quantity * one.sumOfOne;
                 }
             }
-            allMonthIncome.put(month, allIncome);
+            allMonthIncome.put(months, allIncome);
         }
         return allMonthIncome;
     }
 
     public void reconciliation(){
         boolean completed = false;
-        if (monthExpensesAndIncome != null && yearExpensesAndIncome != null) {
-            for (int month: monthExpensesAndIncome.keySet()) {
-                YearData yearData = yearExpensesAndIncome.get(month);
-                if (allMonthExpenses().get(month) == yearData.expenses && allMonthIncome().get(month) == yearData.income) {
-                    completed = true;
-                } else System.out.println("В " + month + " месяце ошибка");
+        for (int month: monthlyReports.keySet()) {
+            if (!monthlyReports.isEmpty() && !yearlyReport.yearExpensesAndIncome.isEmpty()) {
+                    YearData yearData = yearlyReport.yearExpensesAndIncome.get(month);
+                    if (allMonthExpenses().get(month) == yearData.expenses && allMonthIncome().get(month) == yearData.income) {
+                        completed = true;
+                    } else System.out.println("В " + month + " месяце ошибка");
             }
-            if (completed){
-                System.out.println("Операция успешно завершена");
-            }
-        } else System.out.println("Файлы годового или месячных отчётов не были считаны");
+        }
+        if (completed) {
+            System.out.println("Операция успешно завершена");
+        }else System.out.println("Файлы годового или месячных отчётов не были считаны");
+    }
+
+    public String getMonthName(int month){
+        String [] months = {"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+        return months[month];
     }
 }
