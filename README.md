@@ -1,2 +1,4 @@
-# java-sprint2-hw
-Second sprint homework
+# Java reconciliation of reports
+Это моя вторая практическая работа.
+
+С её помощью можно загружать в программу отчёты в формате "csv" и сверять их.
